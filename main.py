@@ -11,12 +11,15 @@ from constants import TEST_SIZE, RANDOM_STATE
 
 
 def config(method_name: str = 'load_iris') -> tuple:
-    load = getattr(datasets, method_name)
-    base = load()
-    predictions = base.data
-    base_class = base.target
-    dummy_class = np_utils.to_categorical(base_class)
-    return base_class, predictions, dummy_class
+    try:
+        load = getattr(datasets, method_name)
+        base = load()
+        predictions = base.data
+        base_class = base.target
+        dummy_class = np_utils.to_categorical(base_class)
+        return base_class, predictions, dummy_class
+    except AttributeError:
+        return False, False, False
 
 
 def plot_learning_curve_graph(model):
@@ -44,6 +47,9 @@ def run_mlp_one_hidden_layer(
         dataset: str = 'load_iris'):
 
     base_class, predictions, dummy_class = config(dataset)
+
+    if not base_class:
+        return print('Invalid dataset method name')
 
     X_training, X_test, y_training, y_test = train_test_split(
         predictions, dummy_class, test_size=test_size, random_state=random_state)
